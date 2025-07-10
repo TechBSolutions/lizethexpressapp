@@ -25,6 +25,7 @@ jobs:
 
       - name: npm install, build, and test
         run: |
+          cd backend
           npm install
           npm run build --if-present
           npm run test --if-present
@@ -52,9 +53,9 @@ jobs:
         with:
           name: node-app
 
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-      
+           - name: Unzip artifact for deployment
+        run: unzip release.zip -d .
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -69,4 +70,5 @@ jobs:
           app-name: 'lizethexpress-backend'
           slot-name: 'Production'
           package: .
+
           
