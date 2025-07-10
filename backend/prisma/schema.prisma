@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo principal de clientes
+model Customer {
+IDcard        Int       @unique @id @default(autoincrement())
+cardCode      String?    @unique
+CardName      String    @default("")
+CardType      String    @default("")
+CntctPrsn     String    @default("")
+Phone         String    @default("")
+E_mail        String    @default("")
+UserWeb       String    @unique @default("")
+PasswordWeb   String    @default("")
+Create_date   DateTime  @default(now())
+Modify_Date   DateTime  @default(now())
+ZipCode       String    @default("")
+NIT           String    @unique
+Address       String    @default("")
+Discount      Int       @default(0)
+CreditLin     Int       @default(0)
+City          String    @default("")
+State         String    @default("")
+Country       String    @default("")
+Status        String    @default("")
+Balance       Int       @default(0)
+Route         Int       @default(0)
+
+  // Relación con Address (uno a muchos)
+  addresses     Address[]
+}
+
+// Modelo de direcciones asociadas a cada cliente
+model Address {
+  id            Int        @id @default(autoincrement())
+  cardCode      String 
+  customer      Customer   @relation(fields: [cardCode], references: [cardCode])
+  idAddress     Int        @default(autoincrement()) 
+  typeAddress   AddressType
+  zipCode       String
+  country       String
+  state         String
+  city          String
+  street        String
+  cntctPerson   String
+  phone         String
+  address1      String
+  address2      String
+  createDate    DateTime
+  modifyDate    DateTime
+  latitude      String
+  longitude     String
+  reference     String?
+ 
+
+
+
+
+  @@unique([cardCode, idAddress]) // La combinación cardCode + idAddress es única por cliente
+}
+
+// Enum para el tipo de dirección
+enum AddressType {
+  PICKUP    // 1 = Recolección
+  DELIVERY  // 2 = Envío
+}
+
+model QuotationHeader {
+  id               Int              @id @default(autoincrement())
+  docNum           String           @unique
+  cardCode         String
+  pickupAddress    String
+  deliveryAddress  String
+  createDate       DateTime         @default(now())
+  modifyDate       DateTime         @updatedAt
+  pickupDate       DateTime?
+  comment          String?
+  discount         Int              @default(0)
+  totalDiscount    Float            @default(0)
+  totalSum         Float
+  volumen          Float            @default(0)
+  volumenUnit      String
+  docTotal         Float
+  docStatus        DocStatus        @default(O)
+  canceled         Canceled         @default(N)
+  cancelDate       DateTime?
+  createdBy        String
+
+  details          QuotationDetail[]
+}
+
+model QuotationDetail {
+  id                Int              @id @default(autoincrement())
+  quotationHeaderId Int
+  itemCode       String
+  description       String
+  unit              String
+  quantity          Float
+  salePrice         Float
+  deliveryAddressId String?
+  totalLine         Float
+
+  header            QuotationHeader  @relation(fields: [quotationHeaderId], references: [id])
+}
+
+enum DocStatus {
+  O //Open
+  C //Closet
+}
+
+enum Canceled {
+  Y //Yes
+  N //No
+}
+
+
+// Enums para mejor legibilidad y control de valores
+enum DocType {
+  I // Item
+  S // Service
+}
+
+
+model Item {
+  id             Int       @id @default(autoincrement())
+  itemCode       String    @unique     // SKU or internal product code
+  name           String
+  description    String?
+  unit           String    // Unit of measurement
+  size           Float?
+  barcode        String?   // EAN/UPC code
+  costPrice      Float
+  salePrice      Float
+  wholesalePrice Float?
+  stock          Int       @default(0)
+  minStock       Int       @default(0)
+  location       String?
+  isActive       Boolean   @default(true)
+  imageUrl       String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  createdBy      String?
+  updatedBy      String?
+  notes          String?
+  itemType       String?   // Product, Service, Kit, etc.
+  batchNumber    String?
+  expirationDate DateTime?
+  maxDiscount    Float?
+
+  @@map("items")
+}
+model User {
+  id            Int      @id @default(autoincrement())
+  username      String   @unique
+  email         String   @unique
+  password      String
+  roleId        Int
+  role          Role     @relation(fields: [roleId], references: [id])
+  permisosExtra Json?    // Permisos específicos para este usuario (puede ser null)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  permisos    Json    // Permisos base de este rol (estructura flexible)
+  isSuperadmin Boolean @default(false)
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
