@@ -53,7 +53,7 @@ jobs:
         with:
           name: node-app
 
-           - name: Unzip artifact for deployment
+      - name: Unzip artifact for deployment
         run: unzip release.zip -d .
 
       - name: Login to Azure
