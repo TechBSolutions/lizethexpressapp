@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Plus, SkipBack, Pencil, ShieldX, ShieldCheck } from "lucide-react";
 import AddressCreateModal from "./AddressCreateModal"; // Ajusta la ruta si es diferente
+import {fetchApi} from "@/api";
 
 export default function CustomerDetail() {
   const { cardCode } = useParams();
@@ -21,7 +22,7 @@ export default function CustomerDetail() {
       setLoading(true);
       setError("");
       try {
-        const resCustomer = await fetch(`/api/customers/${cardCode}`);
+        const resCustomer = await fetchApi(`/api/customers/${cardCode}`);
         if (!resCustomer.ok) {
           setError(`Cliente no encontrado (status ${resCustomer.status})`);
           setCustomer(null);
@@ -33,10 +34,10 @@ export default function CustomerDetail() {
         const dataCustomer = await resCustomer.json();
         setCustomer(dataCustomer);
 
-        const resPickup = await fetch(`/api/addresses?cardCode=${cardCode}&TypeAddress=1`);
+        const resPickup = await fetchApi(`/api/addresses?cardCode=${cardCode}&TypeAddress=1`);
         setPickupAddresses(await resPickup.json());
 
-        const resShipping = await fetch(`/api/addresses?cardCode=${cardCode}&TypeAddress=2`);
+        const resShipping = await fetchApi(`/api/addresses?cardCode=${cardCode}&TypeAddress=2`);
         setShippingAddresses(await resShipping.json());
       } catch (err) {
         setError("Error cargando datos del cliente");
@@ -93,7 +94,7 @@ export default function CustomerDetail() {
                 ? "¿Estás seguro que deseas deshabilitar este cliente?"
                 : "¿Estás seguro que deseas habilitar este cliente?";
               if (window.confirm(msg)) {
-                await fetch(`/api/customers/${customer.cardCode}/${action}`, { method: "PATCH" });
+                await fetchApi(`/api/customers/${customer.cardCode}/${action}`, { method: "PATCH" });
                 window.location.reload();
               }
             }}
@@ -162,7 +163,7 @@ export default function CustomerDetail() {
                         ? "¿Deshabilitar esta dirección?"
                         : "¿Habilitar esta dirección?";
                       if (window.confirm(msg)) {
-                        await fetch(`/api/addresses/${addr.idAddress}/${action}`, { method: "PATCH" });
+                        await fetchApi(`/api/addresses/${addr.idAddress}/${action}`, { method: "PATCH" });
                         window.location.reload();
                       }
                     }}
@@ -207,7 +208,7 @@ export default function CustomerDetail() {
                         ? "¿Deshabilitar esta dirección?"
                         : "¿Habilitar esta dirección?";
                       if (window.confirm(msg)) {
-                        await fetch(`/api/addresses/${addr.idAddress}/${action}`, { method: "PATCH" });
+                        await fetchApi(`/api/addresses/${addr.idAddress}/${action}`, { method: "PATCH" });
                         window.location.reload();
                       }
                     }}
