@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import {fetchApi} from "@/api";
 
 export default function CustomerEdit() {
   const { cardCode } = useParams();
@@ -10,7 +11,7 @@ export default function CustomerEdit() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`/api/customers/${cardCode}`)
+    fetchApi(`/api/customers/${cardCode}`)
       .then(res => res.json())
       .then(data => { setForm(data); setLoading(false); })
       .catch(() => { setError("Error al cargar datos"); setLoading(false); });
@@ -26,7 +27,7 @@ export default function CustomerEdit() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    await fetch(`/api/customers/${cardCode}`, {
+    await fetchApi(`/api/customers/${cardCode}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form)
