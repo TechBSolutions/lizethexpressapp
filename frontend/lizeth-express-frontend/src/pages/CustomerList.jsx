@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, SkipBack } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { fetchApi } from "../api"; // <--- Importa tu utilitario
 
 export default function CustomerList() {
   const navigate = useNavigate();
@@ -12,9 +13,12 @@ export default function CustomerList() {
   const [filteredCustomers, setFilteredCustomers] = useState([]);
 
   useEffect(() => {
-    fetch("/api/customers")
+    fetchApi("/customers")
       .then(res => res.json())
-      .then(setCustomers);
+      .then(data => {
+        // Asegura que sea array, sino deja vacío (evita errores de .map)
+        setCustomers(Array.isArray(data) ? data : []);
+      });
   }, []);
 
   useEffect(() => {
@@ -32,7 +36,7 @@ export default function CustomerList() {
       ? "¿Estás seguro que deseas deshabilitar este cliente?"
       : "¿Estás seguro que deseas habilitar este cliente?";
     if (window.confirm(msg)) {
-      await fetch(`/api/customers/${cardCode}/${action}`, { method: "PATCH" });
+      await fetchApi(`/customers/${cardCode}/${action}`, { method: "PATCH" });
       window.location.reload();
     }
   };

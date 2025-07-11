@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { fetchApi } from "@/api";
 
 export default function AddressEdit() {
   const { idAddress } = useParams();
@@ -14,7 +15,7 @@ export default function AddressEdit() {
 
   // Cargar datos de la dirección
   useEffect(() => {
-    fetch(`/api/addresses/${idAddress}`)
+    fetchApi(`/addresses/${idAddress}`)
       .then(res => res.json())
       .then(data => {
         setForm(data);
@@ -24,7 +25,7 @@ export default function AddressEdit() {
 
   // Listar países
   useEffect(() => {
-    fetch("/api/geodb/countries")
+    fetchApi("/geodb/countries")
       .then(res => res.json())
       .then(setCountries);
   }, []);
@@ -32,7 +33,7 @@ export default function AddressEdit() {
   // Listar estados cuando cambia el país
   useEffect(() => {
     if (form && form.country) {
-      fetch(`/api/geodb/regions/${form.country}`)
+      fetchApi(`/geodb/regions/${form.country}`)
         .then(res => res.json())
         .then(setStates);
     }
@@ -41,7 +42,7 @@ export default function AddressEdit() {
   // Listar ciudades cuando cambia el estado o país
   useEffect(() => {
     if (form && form.country && form.state) {
-      fetch(`/api/geodb/cities/${form.country}/${form.state}`)
+      fetchApi(`/geodb/cities/${form.country}/${form.state}`)
         .then(res => res.json())
         .then(setCities);
     }
@@ -69,7 +70,7 @@ export default function AddressEdit() {
   const handleSubmit = async e => {
     e.preventDefault();
     const { idAddress, ...dataToSend } = form; // No enviar idAddress al backend
-    await fetch(`/api/addresses/${idAddress}`, {
+    await fetchApi(`/addresses/${idAddress}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dataToSend)
