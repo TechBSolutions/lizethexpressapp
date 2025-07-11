@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { fetchApi, postApi, putApi, deleteApi } from "@/api";
 
 export default function AddressCreateModal({ open, onClose, customer, onSuccess }) {
   const [form, setForm] = useState({
@@ -25,7 +26,7 @@ export default function AddressCreateModal({ open, onClose, customer, onSuccess 
   // Listar países
   useEffect(() => {
     if (open) {
-      fetch("/api/geodb/countries")
+      fetchApi("/api/geodb/countries")
         .then(res => res.json())
         .then(data => setCountries(data));
     }
@@ -34,7 +35,7 @@ export default function AddressCreateModal({ open, onClose, customer, onSuccess 
   // Listar estados/departamentos
   useEffect(() => {
     if (form.Country) {
-      fetch(`/api/geodb/regions/${form.Country}`)
+      fetchApi(`/api/geodb/regions/${form.Country}`)
         .then(res => res.json())
         .then(data => setStates(data));
       setForm(f => ({ ...f, State: "", City: "" }));
@@ -45,7 +46,7 @@ export default function AddressCreateModal({ open, onClose, customer, onSuccess 
   // Listar ciudades
   useEffect(() => {
     if (form.Country && form.State) {
-      fetch(`/api/geodb/cities/${form.Country}/${form.State}`)
+      fetchApi(`/api/geodb/cities/${form.Country}/${form.State}`)
         .then(res => res.json())
         .then(data => setCities(data));
       setForm(f => ({ ...f, City: "" }));
@@ -66,7 +67,7 @@ export default function AddressCreateModal({ open, onClose, customer, onSuccess 
             ...form,
             cardCode: customer.cardCode,
           });
-      const res = await fetch("/api/addresses", {
+      const res = await fetchApi("/api/addresses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

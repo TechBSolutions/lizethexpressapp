@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SkipBack, Save } from "lucide-react";
-
+import {fetchApi} from "@/api";
 export default function CustomerCreate() {
   const [form, setForm] = useState({
     CardName: "",
@@ -37,7 +37,7 @@ export default function CustomerCreate() {
 
   // Listar países
   useEffect(() => {
-    fetch("/api/geodb/countries")
+    fetchApi("/api/geodb/countries")
       .then(res => res.json())
       .then(data => {
         console.log("PAISES EN FRONTEND", data); // <--- AGREGA ESTO
@@ -48,7 +48,7 @@ export default function CustomerCreate() {
   // Listar estados/departamentos
   useEffect(() => {
     if (form.Country) {
-      fetch(`/api/geodb/regions/${form.Country}`)
+      fetchApi(`/api/geodb/regions/${form.Country}`)
         .then(res => res.json())
         .then(data => setStates(data));
       setForm(f => ({ ...f, State: "", City: "" }));
@@ -59,7 +59,7 @@ export default function CustomerCreate() {
   // Listar ciudades
   useEffect(() => {
     if (form.Country && form.State) {
-      fetch(`/api/geodb/cities/${form.Country}/${form.State}`)
+      fetchApi(`/api/geodb/cities/${form.Country}/${form.State}`)
         .then(res => res.json())
         .then(data => setCities(data));
       setForm(f => ({ ...f, City: "" }));
@@ -85,7 +85,7 @@ export default function CustomerCreate() {
     }
 
     try {
-      const res = await fetch("/api/customers", {
+      const res = await fetchApi("/api/customers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
